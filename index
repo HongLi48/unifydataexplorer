@@ -1,0 +1,1324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Data Schema — T-Mobile DDM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+  :root {
+    --magenta: #E20074;
+    --magenta-dark: #861B54;
+    --magenta-light: #fce6f2;
+    --magenta-hover: #c8006a;
+    --black: #000000;
+    --white: #ffffff;
+    --gray-light: #E8E8E8;
+    --gray-mid: #6A6A6A;
+    --gray-dark: #2a2a2a;
+    --surface: #f7f7f7;
+    --border: #e0e0e0;
+    --success: #1a7a3c;
+    --success-bg: #e8f5ee;
+    --warning: #b35c00;
+    --warning-bg: #fff3e0;
+    --error: #c0392b;
+    --error-bg: #fdecea;
+    --font: 'Roboto', 'TeleNeo', sans-serif;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--surface);
+    color: var(--black);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    background: var(--white);
+    border-bottom: 3px solid var(--magenta);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .t-digit {
+    width: 32px;
+    height: 32px;
+    background: var(--magenta);
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .header-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--black);
+    letter-spacing: -0.2px;
+  }
+
+  .header-subtitle {
+    font-size: 12px;
+    color: var(--gray-mid);
+    font-weight: 400;
+  }
+
+  .header-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+    margin: 0 4px;
+  }
+
+  .header-badge {
+    background: var(--magenta-light);
+    color: var(--magenta-dark);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 10px;
+  }
+
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .input-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-dark);
+  }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--gray-mid);
+    margin-top: 2px;
+  }
+
+  input[type="text"], input[type="password"], textarea, select {
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--black);
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+    border-color: var(--magenta);
+  }
+
+  textarea { resize: vertical; min-height: 72px; }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--surface);
+  }
+
+  .upload-zone:hover { border-color: var(--magenta); background: var(--magenta-light); }
+  .upload-zone.has-file { border-color: var(--success); background: var(--success-bg); border-style: solid; }
+
+  .upload-zone-label {
+    font-size: 12px;
+    color: var(--gray-mid);
+    display: block;
+    margin-top: 4px;
+  }
+
+  .upload-icon {
+    width: 28px;
+    height: 28px;
+    margin: 0 auto 4px;
+    color: var(--gray-mid);
+  }
+
+  .file-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--success);
+    margin-top: 4px;
+    word-break: break-all;
+  }
+
+  .sidebar-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Pipeline steps */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pipeline-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+    position: relative;
+  }
+
+  .pipeline-step:hover:not(.disabled) {
+    border-color: var(--magenta);
+    background: var(--magenta-light);
+  }
+
+  .pipeline-step.active {
+    border-color: var(--magenta);
+    background: var(--magenta-light);
+  }
+
+  .pipeline-step.completed {
+    border-color: var(--success);
+    background: var(--success-bg);
+  }
+
+  .pipeline-step.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .pipeline-step.running {
+    border-color: var(--magenta);
+    background: var(--magenta-light);
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gray-light);
+    color: var(--gray-mid);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pipeline-step.active .step-num,
+  .pipeline-step.running .step-num {
+    background: var(--magenta);
+    color: white;
+  }
+
+  .pipeline-step.completed .step-num {
+    background: var(--success);
+    color: white;
+  }
+
+  .step-info { flex: 1; min-width: 0; }
+
+  .step-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--black);
+  }
+
+  .step-desc {
+    font-size: 11px;
+    color: var(--gray-mid);
+  }
+
+  .step-action {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--magenta);
+    white-space: nowrap;
+  }
+
+  .pipeline-step.completed .step-action { color: var(--success); }
+  .pipeline-step.disabled .step-action { color: var(--gray-mid); }
+
+  /* Run button */
+  .run-btn {
+    background: var(--magenta);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 20px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.2px;
+  }
+
+  .run-btn:hover:not(:disabled) { background: var(--magenta-hover); }
+  .run-btn:active:not(:disabled) { transform: scale(0.98); }
+  .run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .run-btn.secondary {
+    background: var(--white);
+    color: var(--magenta);
+    border: 1.5px solid var(--magenta);
+  }
+
+  .run-btn.secondary:hover:not(:disabled) {
+    background: var(--magenta-light);
+  }
+
+  /* Main content */
+  .main {
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+  }
+
+  .main-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .main-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--black);
+    letter-spacing: -0.3px;
+  }
+
+  .main-subtitle {
+    font-size: 14px;
+    color: var(--gray-mid);
+    margin-top: 2px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--magenta-light);
+    color: var(--magenta-dark);
+  }
+
+  .card-body { padding: 20px; }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .empty-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--magenta-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-dark);
+  }
+
+  .empty-desc {
+    font-size: 13px;
+    color: var(--gray-mid);
+    max-width: 320px;
+  }
+
+  /* Table */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-mid);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--black);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .tag-magenta { background: var(--magenta-light); color: var(--magenta-dark); }
+  .tag-gray { background: var(--gray-light); color: var(--gray-mid); }
+  .tag-green { background: var(--success-bg); color: var(--success); }
+  .tag-warning { background: var(--warning-bg); color: var(--warning); }
+
+  .key-cell {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  /* Streaming output */
+  .stream-box {
+    background: var(--gray-dark);
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    padding: 16px;
+    border-radius: var(--radius);
+    min-height: 80px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .spinner.dark {
+    border-color: rgba(226,0,116,0.25);
+    border-top-color: var(--magenta);
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .status-bar.info { background: var(--magenta-light); color: var(--magenta-dark); }
+  .status-bar.success { background: var(--success-bg); color: var(--success); }
+  .status-bar.error { background: var(--error-bg); color: var(--error); }
+
+  /* Print */
+  .print-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray-dark);
+    transition: all 0.15s;
+  }
+
+  .print-btn:hover { border-color: var(--magenta); color: var(--magenta); }
+
+  /* API key visibility toggle */
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .input-row input { flex: 1; }
+
+  .toggle-btn {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--gray-mid);
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .toggle-btn:hover { border-color: var(--magenta); color: var(--magenta); }
+
+  /* Summary stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--magenta);
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray-mid);
+    margin-top: 2px;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 3px;
+    background: var(--magenta-light);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  @keyframes progress-anim {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--magenta);
+    border-radius: 2px;
+    width: 40%;
+    animation: progress-anim 1.2s ease-in-out infinite;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-mid);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+
+  .tab:hover { color: var(--magenta); }
+  .tab.active { color: var(--magenta); border-bottom-color: var(--magenta); }
+
+  /* Tooltip for key info */
+  .info-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--gray-light);
+    color: var(--gray-mid);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: default;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  @media print {
+    .sidebar, .header, .run-btn, .print-btn, .pipeline-step, .stream-box { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .main { padding: 0; }
+    body { background: white; }
+    .card { break-inside: avoid; border: 1px solid #ccc; }
+    table { font-size: 11px; }
+    td, th { padding: 6px 10px; }
+  }
+
+  .fadeIn { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">
+    <div class="t-digit">T</div>
+    <div>
+      <div class="header-title">Unified Data Schema</div>
+      <div class="header-subtitle">Digital Data Management</div>
+    </div>
+  </div>
+  <div class="header-divider"></div>
+  <span class="header-badge">Pilot v1.0</span>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <div>
+      <div class="section-label">Configuration</div>
+      <div class="input-section">
+
+        <div class="input-group">
+          <label class="input-label">Anthropic API Key</label>
+          <div class="input-row">
+            <input type="password" id="apiKey" placeholder="sk-ant-..." />
+            <button class="toggle-btn" onclick="toggleKey()">Show</button>
+          </div>
+          <div class="input-hint">Your key — never stored or sent anywhere except Anthropic.</div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Flow / Feature Description</label>
+          <textarea id="description" placeholder="e.g. Credit Check flow — prospect and customer users on postpaid web + app. Covers identity verification and credit decision events during checkout."></textarea>
+          <div class="input-hint">Line of business, user type, flow name. 2–4 sentences.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div>
+      <div class="section-label">Tech Spec Document</div>
+      <div class="input-section">
+        <div class="input-group">
+          <label class="input-label">Upload PDF or DOC</label>
+          <div class="upload-zone" id="specZone" onclick="document.getElementById('specFile').click()">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <span class="upload-zone-label">Click to upload tech spec</span>
+            <div class="file-name" id="specFileName"></div>
+          </div>
+          <input type="file" id="specFile" accept=".pdf,.doc,.docx,.txt,.md" style="display:none" onchange="handleFileUpload('spec', this)">
+          <div class="input-hint">PDF, DOC, DOCX, or TXT accepted.</div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Or paste Confluence content</label>
+          <textarea id="specText" placeholder="Paste tech spec text here if you exported from Confluence..." style="min-height:90px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div>
+      <div class="section-label">Agent Pipeline</div>
+      <div class="pipeline">
+        <div class="pipeline-step active" id="step1" onclick="selectStep(1)">
+          <div class="step-num">1</div>
+          <div class="step-info">
+            <div class="step-name">Tech Spec Agent</div>
+            <div class="step-desc">Extract & classify keys</div>
+          </div>
+          <span class="step-action">Run →</span>
+        </div>
+        <div class="pipeline-step disabled" id="step2" onclick="selectStep(2)">
+          <div class="step-num">2</div>
+          <div class="step-info">
+            <div class="step-name">EDL Agent</div>
+            <div class="step-desc">Actual values from data lake</div>
+          </div>
+          <span class="step-action">Locked</span>
+        </div>
+        <div class="pipeline-step disabled" id="step3" onclick="selectStep(3)">
+          <div class="step-num">3</div>
+          <div class="step-info">
+            <div class="step-name">Schema Analyst</div>
+            <div class="step-desc">Expected vs. actual gap</div>
+          </div>
+          <span class="step-action">Locked</span>
+        </div>
+        <div class="pipeline-step disabled" id="step4" onclick="selectStep(4)">
+          <div class="step-num">4</div>
+          <div class="step-info">
+            <div class="step-name">Schema Master</div>
+            <div class="step-desc">Best practice recommendations</div>
+          </div>
+          <span class="step-action">Locked</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <button class="run-btn" id="runBtn" onclick="runActiveAgent()">
+      <span id="runBtnText">Run Tech Spec Agent</span>
+    </button>
+
+  </aside>
+
+  <!-- Main content -->
+  <main class="main" id="mainContent">
+
+    <!-- Welcome state -->
+    <div id="welcomeState">
+      <div class="main-header">
+        <div>
+          <div class="main-title">Unified Data Schema Tool</div>
+          <div class="main-subtitle">Credit Check · BYOD eSIM · And more</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            How it works
+            <span class="card-title-badge">Step-by-step</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--magenta);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Configure</div>
+                  <div style="font-size:12px;color:var(--gray-mid)">Add your API key, describe the flow, upload the tech spec PDF or paste the Confluence export.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--magenta);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Run Tech Spec Agent</div>
+                  <div style="font-size:12px;color:var(--gray-mid)">AI extracts every data key, translates CDL → event key names, adds business descriptions and valid values.</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--gray-light);color:var(--gray-mid);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600">EDL Agent <span style="font-size:10px;color:var(--gray-mid)">(coming next)</span></div>
+                  <div style="font-size:12px;color:var(--gray-mid)">Upload Excel exports from the data lake. Compare WEB vs APP actual values observed.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--gray-light);color:var(--gray-mid);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Schema Master <span style="font-size:10px;color:var(--gray-mid)">(coming next)</span></div>
+                  <div style="font-size:12px;color:var(--gray-mid)">Get best-practice recommendations — minimum viable key set, naming conventions, platform parity.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:var(--magenta-light);border-radius:var(--radius);font-size:12px;color:var(--magenta-dark)">
+            <strong>Start:</strong> Fill in the sidebar, upload your tech spec, then click <strong>Run Tech Spec Agent</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Current pilot scope</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="tag tag-magenta">Credit Check</span>
+            <span class="tag tag-magenta">BYOD eSIM</span>
+            <span class="tag tag-gray">Postpaid Web</span>
+            <span class="tag tag-gray">Postpaid App</span>
+            <span class="tag tag-gray">Prepaid Web</span>
+            <span class="tag tag-gray">Prepaid App</span>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:var(--gray-mid)">Phase 1 covers Tech Spec Agent. EDL Agent, Schema Analyst, and Schema Master unlock in subsequent phases.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results state (hidden initially) -->
+    <div id="resultsState" style="display:none">
+
+      <div class="main-header">
+        <div>
+          <div class="main-title" id="resultsTitle">Tech Spec Analysis</div>
+          <div class="main-subtitle" id="resultsSubtitle">Results from Tech Spec Agent</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="print-btn" onclick="window.print()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print Report
+          </button>
+          <button class="print-btn" onclick="exportCSV()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow" style="display:none">
+        <div class="stat-card">
+          <div class="stat-value" id="stat1">—</div>
+          <div class="stat-label">Total Keys</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat2">—</div>
+          <div class="stat-label">With Valid Values</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat3">—</div>
+          <div class="stat-label">Event Triggers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat4">—</div>
+          <div class="stat-label">Key Categories</div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="status-bar info" id="statusBar" style="display:none">
+        <span class="spinner dark"></span>
+        <span id="statusText">Analyzing tech spec...</span>
+      </div>
+
+      <!-- Stream log -->
+      <div id="streamSection" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Agent log</div>
+            <div style="font-size:12px;color:var(--gray-mid)" id="streamStatus">Processing...</div>
+          </div>
+          <div class="card-body">
+            <div class="progress-bar" id="progressBar"><div class="progress-fill"></div></div>
+            <div class="stream-box" id="streamBox">Initializing Tech Spec Agent...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table results -->
+      <div id="tableSection" style="display:none" class="fadeIn">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              Extracted Data Keys
+              <span class="card-title-badge" id="keyCountBadge">0 keys</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" id="tableSearch" placeholder="Search keys..." style="width:180px;font-size:12px;padding:6px 10px" oninput="filterTable()">
+              <select id="categoryFilter" style="font-size:12px;padding:6px 10px;width:140px" onchange="filterTable()">
+                <option value="">All categories</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrapper" style="border:none;border-radius:0">
+              <table id="resultsTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>CDL Key</th>
+                    <th>Data Event Key</th>
+                    <th>Category</th>
+                    <th>Trigger</th>
+                    <th>Data Type</th>
+                    <th>Valid Values</th>
+                    <th>Business Description</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div id="errorSection" style="display:none" class="fadeIn">
+        <div class="card">
+          <div class="card-body">
+            <div class="status-bar error">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="errorText">An error occurred. Please check your API key and try again.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+// State
+const state = {
+  apiKey: '',
+  description: '',
+  specContent: '',
+  specFileName: '',
+  activeStep: 1,
+  completedSteps: [],
+  results: { techSpec: null },
+  allRows: [],
+};
+
+// File upload
+function handleFileUpload(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const zone = document.getElementById('specZone');
+  const nameEl = document.getElementById('specFileName');
+  nameEl.textContent = file.name;
+  zone.classList.add('has-file');
+  state.specFileName = file.name;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    if (file.name.endsWith('.pdf')) {
+      // For PDF, we'll read as text (best-effort for text-based PDFs)
+      state.specContent = '[PDF uploaded: ' + file.name + ']\n\nNote: PDF text extraction is limited in browser. For best results, paste the text from Confluence directly.';
+    } else {
+      state.specContent = e.target.result;
+    }
+  };
+  if (file.name.endsWith('.pdf')) {
+    reader.readAsArrayBuffer(file);
+    // Simple: just note the file, ask user to also paste text
+    state.specContent = '[PDF file: ' + file.name + ' uploaded. Please also paste the text content in the field below for best extraction results.]';
+    nameEl.textContent = file.name + ' ✓';
+  } else {
+    reader.readAsText(file);
+  }
+}
+
+function toggleKey() {
+  const el = document.getElementById('apiKey');
+  const btn = event.target;
+  if (el.type === 'password') { el.type = 'text'; btn.textContent = 'Hide'; }
+  else { el.type = 'password'; btn.textContent = 'Show'; }
+}
+
+function selectStep(num) {
+  const el = document.getElementById('step' + num);
+  if (el.classList.contains('disabled')) return;
+  state.activeStep = num;
+  [1,2,3,4].forEach(i => {
+    const s = document.getElementById('step' + i);
+    if (!s.classList.contains('completed') && !s.classList.contains('disabled')) {
+      s.classList.remove('active');
+    }
+  });
+  if (!el.classList.contains('completed')) el.classList.add('active');
+  const labels = ['Run Tech Spec Agent', 'Run EDL Agent', 'Run Schema Analyst', 'Run Schema Master'];
+  document.getElementById('runBtnText').textContent = labels[num - 1];
+}
+
+async function runActiveAgent() {
+  if (state.activeStep === 1) await runTechSpecAgent();
+}
+
+async function runTechSpecAgent() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const specText = document.getElementById('specText').value.trim();
+  const specContent = state.specContent || specText;
+
+  if (!apiKey) { alert('Please enter your Anthropic API key.'); return; }
+  if (!description) { alert('Please enter a flow description.'); return; }
+  if (!specContent && !specText) { alert('Please upload a tech spec file or paste content.'); return; }
+
+  const content = specContent || specText;
+
+  // Show results area
+  document.getElementById('welcomeState').style.display = 'none';
+  document.getElementById('resultsState').style.display = 'flex';
+  document.getElementById('resultsState').style.flexDirection = 'column';
+  document.getElementById('resultsState').style.gap = '20px';
+  document.getElementById('resultsTitle').textContent = 'Tech Spec Agent';
+  document.getElementById('resultsSubtitle').textContent = 'Extracting and classifying data keys...';
+  document.getElementById('streamSection').style.display = 'block';
+  document.getElementById('tableSection').style.display = 'none';
+  document.getElementById('errorSection').style.display = 'none';
+  document.getElementById('statsRow').style.display = 'none';
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('progressBar').style.display = 'block';
+
+  const runBtn = document.getElementById('runBtn');
+  runBtn.disabled = true;
+  document.getElementById('runBtnText').textContent = 'Running...';
+
+  const streamBox = document.getElementById('streamBox');
+  streamBox.textContent = 'Connecting to Claude...\n';
+
+  const systemPrompt = `You are a Digital Data Management (DDM) analyst at T-Mobile. Your job is to extract and classify all data collection keys from a tech spec document.
+
+The user will provide:
+1. A flow/feature description (context)
+2. A tech spec document (Confluence export, PDF text, or similar)
+
+Your task:
+Extract EVERY data key mentioned in the tech spec that is relevant to the described flow. For each key, provide:
+- cdl_key: The raw CDL/variable key name as written in the spec (e.g. "page.pageInfo.pageName")
+- event_key: The translated data event key name (Adobe Analytics style, e.g. "pageName" or "eVar12" or use camelCase descriptive name if not mapped)
+- category: Group keys into logical categories (Page Info, User Info, Product Info, Event Tracking, Credit/Identity, Error, etc.)
+- trigger: When this key is fired/set (e.g. "On page load", "On form submit", "On CTA click", "On credit decision")
+- data_type: The data type (string, boolean, integer, enum, array)
+- valid_values: If the spec mentions acceptable values, list them pipe-separated (e.g. "approved|declined|error|pending"). Write "dynamic" if it's a free-form value, "N/A" if not specified.
+- business_description: A clear 1-2 sentence business-friendly description of what this key captures and why it matters.
+
+CRITICAL INSTRUCTIONS:
+- Return ONLY a valid JSON array. No markdown, no backticks, no preamble, no explanation.
+- Each element is an object with exactly these fields: cdl_key, event_key, category, trigger, data_type, valid_values, business_description
+- If the spec is unclear on a field, make a reasonable inference based on context and mark with "(inferred)"
+- Prioritize keys that are specific to the flow described. Skip generic library/framework keys.
+- Aim to extract 15-40 keys depending on spec complexity.`;
+
+  const userMessage = `Flow Description:
+${description}
+
+Tech Spec Content:
+${content.substring(0, 12000)}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }],
+        stream: true
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API error ' + response.status);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    streamBox.textContent = 'Analyzing tech spec...\n';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6);
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text;
+            // Show progress in stream box
+            const preview = fullText.length > 400 ? '...' + fullText.slice(-400) : fullText;
+            streamBox.textContent = 'Receiving response...\n\n' + preview;
+            streamBox.scrollTop = streamBox.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+
+    streamBox.textContent = 'Processing complete. Rendering table...\n\n' + fullText.slice(0, 200) + '...';
+
+    // Parse JSON
+    let jsonStr = fullText.trim();
+    // Strip markdown fences if present
+    jsonStr = jsonStr.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    let keys;
+    try {
+      keys = JSON.parse(jsonStr);
+    } catch(e) {
+      // Try to extract JSON array
+      const match = jsonStr.match(/\[[\s\S]*\]/);
+      if (match) {
+        keys = JSON.parse(match[0]);
+      } else {
+        throw new Error('Could not parse JSON response. Raw: ' + jsonStr.slice(0, 200));
+      }
+    }
+
+    state.results.techSpec = keys;
+    state.allRows = keys;
+
+    // Render
+    renderTechSpecTable(keys);
+
+    // Mark step 1 complete
+    const s1 = document.getElementById('step1');
+    s1.classList.remove('active');
+    s1.classList.add('completed');
+    s1.querySelector('.step-action').textContent = '✓ Done';
+    state.completedSteps.push(1);
+
+    document.getElementById('resultsSubtitle').textContent = keys.length + ' keys extracted from tech spec';
+    document.getElementById('streamStatus').textContent = 'Complete';
+    document.getElementById('progressBar').style.display = 'none';
+
+  } catch(err) {
+    document.getElementById('streamSection').style.display = 'none';
+    document.getElementById('errorSection').style.display = 'block';
+    document.getElementById('errorText').textContent = 'Error: ' + err.message;
+    console.error(err);
+  } finally {
+    runBtn.disabled = false;
+    document.getElementById('runBtnText').textContent = 'Run Tech Spec Agent';
+  }
+}
+
+function renderTechSpecTable(keys) {
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = '';
+
+  // Collect categories for filter
+  const categories = [...new Set(keys.map(k => k.category).filter(Boolean))];
+  const catFilter = document.getElementById('categoryFilter');
+  catFilter.innerHTML = '<option value="">All categories</option>';
+  categories.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    catFilter.appendChild(opt);
+  });
+
+  // Stats
+  const withValues = keys.filter(k => k.valid_values && k.valid_values !== 'N/A' && k.valid_values !== 'dynamic').length;
+  const triggers = [...new Set(keys.map(k => k.trigger).filter(Boolean))].length;
+  document.getElementById('stat1').textContent = keys.length;
+  document.getElementById('stat2').textContent = withValues;
+  document.getElementById('stat3').textContent = triggers;
+  document.getElementById('stat4').textContent = categories.length;
+  document.getElementById('statsRow').style.display = 'grid';
+  document.getElementById('keyCountBadge').textContent = keys.length + ' keys';
+
+  keys.forEach((key, i) => {
+    const tr = document.createElement('tr');
+
+    const typeColor = {
+      'string': 'tag-gray',
+      'boolean': 'tag-green',
+      'integer': 'tag-magenta',
+      'enum': 'tag-warning',
+      'array': 'tag-warning',
+    }[key.data_type?.toLowerCase()] || 'tag-gray';
+
+    tr.innerHTML = `
+      <td style="color:var(--gray-mid);font-size:12px">${i+1}</td>
+      <td><span class="key-cell">${escHtml(key.cdl_key || '')}</span></td>
+      <td><span class="key-cell" style="background:var(--magenta-light);border-color:var(--magenta-light);color:var(--magenta-dark)">${escHtml(key.event_key || '')}</span></td>
+      <td><span class="tag tag-gray">${escHtml(key.category || '')}</span></td>
+      <td style="font-size:12px;color:var(--gray-dark);max-width:180px">${escHtml(key.trigger || '')}</td>
+      <td><span class="tag ${typeColor}">${escHtml(key.data_type || '')}</span></td>
+      <td style="font-size:11px;color:var(--gray-mid);max-width:160px;font-family:'Courier New',monospace">${escHtml(key.valid_values || 'N/A')}</td>
+      <td style="font-size:12px;max-width:240px;line-height:1.5">${escHtml(key.business_description || '')}</td>
+    `;
+    tr.dataset.category = key.category || '';
+    tr.dataset.search = (key.cdl_key + ' ' + key.event_key + ' ' + key.business_description + ' ' + key.category).toLowerCase();
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('streamSection').style.display = 'none';
+  document.getElementById('tableSection').style.display = 'block';
+  document.getElementById('tableSection').classList.add('fadeIn');
+}
+
+function filterTable() {
+  const search = document.getElementById('tableSearch').value.toLowerCase();
+  const cat = document.getElementById('categoryFilter').value;
+  const rows = document.querySelectorAll('#resultsBody tr');
+  rows.forEach(row => {
+    const matchSearch = !search || row.dataset.search.includes(search);
+    const matchCat = !cat || row.dataset.category === cat;
+    row.style.display = (matchSearch && matchCat) ? '' : 'none';
+  });
+}
+
+function exportCSV() {
+  if (!state.allRows.length) return;
+  const headers = ['#','CDL Key','Data Event Key','Category','Trigger','Data Type','Valid Values','Business Description'];
+  const rows = state.allRows.map((k, i) => [
+    i+1, k.cdl_key, k.event_key, k.category, k.trigger, k.data_type, k.valid_values, k.business_description
+  ].map(v => '"' + String(v||'').replace(/"/g,'""') + '"'));
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'unified-data-schema-tech-spec.csv';
+  a.click();
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
+
